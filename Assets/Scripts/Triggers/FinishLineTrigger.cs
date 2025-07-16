@@ -1,27 +1,37 @@
+﻿using Assets.Scripts.Controllers;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class FinishLineTrigger : MonoBehaviour
 {
-    [Tooltip("Event invoked when player crosses finish line.")]
-    public UnityEvent FinishLineCrossedEvent;
-
-    [Tooltip("GameObjects to interact with.")]
-    public GameObject[] TriggerCandidates;
-
-    private HashSet<GameObject> triggerCandidates;
-
-    private void Awake()
-    {
-        this.triggerCandidates = new HashSet<GameObject>(this.TriggerCandidates);
-    }
+    public GameObject winPanel;
+    public TextMeshProUGUI scoreText;
+    public AudioSource winAudio;
+    public ScoreManager scoreManager; // Nếu bạn có class quản lý điểm
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (this.triggerCandidates.Contains(other.gameObject))
+        if (other.CompareTag("Player"))
         {
-            this.FinishLineCrossedEvent.Invoke();
+            Debug.Log("WIN! Chạm cột đích");
+            winPanel.SetActive(true);
+            winAudio.Play();
+            Time.timeScale = 0f; // Dừng game
+            //scoreText.text = "Total Score: " + scoreManager.scoreText;
         }
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
+
+    public void NextLevel()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 }
